@@ -430,6 +430,18 @@ FUNCTION {format.url}
   if$
 }
 
+FUNCTION {add.url}
+{ duplicate$ empty$
+    { skip$ }
+    { url empty$
+        {}
+        {"\href{" url * "}{" * swap$ * "}" *}
+      if$
+    }
+  if$
+}
+
+
 FUNCTION {add.doi}
 { duplicate$ empty$
     { skip$ }
@@ -844,7 +856,12 @@ FUNCTION {article}
   crossref missing$
   { journal missing$   
         {}
-        { format.journal add.doi "journal" output.check}
+        { format.journal 
+          url missing$
+	          {  add.doi }
+	          {  add.url }
+	  if$
+         "journal" output.check}
       if$
     report missing$
         {format.eprint output}
@@ -857,7 +874,10 @@ FUNCTION {article}
     }
   if$
   new.sentence
-  format.url output
+  journal missing$ 
+      { format.url output }
+      { }
+  if$
   new.sentence
   note output
   new.sentence
