@@ -404,7 +404,11 @@ FUNCTION {format.primaryClass}
 {
   primaryClass empty$
       { "" }
-      { " [" primaryClass * "]" *}
+      { eprint primaryClass text.length$ text.prefix$ primaryClass =
+          { "" }
+      	  { " [" primaryClass * "]" *}
+        if$ 
+      }
   if$            
 }
 
