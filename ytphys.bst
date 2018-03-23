@@ -406,7 +406,7 @@ FUNCTION {format.primaryClass}
       { "" }
       { eprint primaryClass text.length$ text.prefix$ primaryClass =
           { "" }
-      	  { " [" primaryClass * "]" *}
+      	  { "~[" primaryClass * "]" *}
         if$ 
       }
   if$            
@@ -417,10 +417,10 @@ FUNCTION {format.eprint}
      { ""}
      { archive empty$
           {"\href{http://arxiv.org/abs/" eprint * "}" * 
-             "{{\ttfamily " * format.archive * eprint *
+             "{{ " * format.archive * eprint *
               format.primaryClass * "}}" *}
           {"\href{" archive *  "/" * eprint * "}" * 
-             "{{\ttfamily " * format.archive * eprint *
+             "{{ " * format.archive * eprint *
               format.primaryClass * "}}" *}
        if$
      }
@@ -487,7 +487,7 @@ FUNCTION {format.editors}
 FUNCTION {format.title}
 { title empty$
     { "" }
-    { "``" title "t" change.case$ * ",''" * }
+    { "{\slshape " title "t" change.case$ * ",}" * }
   if$
 }
 
