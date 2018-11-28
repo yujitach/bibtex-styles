@@ -177,7 +177,7 @@ ENTRY
     url
  }
  {}
- { label extra.label sort.label bysame }
+ { label extra.label sort.label bysame xyear xyearmonth}
 
 % Removed after.sentence, after.block---not needed.
 
@@ -438,9 +438,9 @@ FUNCTION {format.language}
 
 % This version of format.names puts names in the format
 %
-% First von Last, Jr.
+% F. von Last, Jr.
 %
-% (i.e., first name first, no abbreviating to initials).
+% (i.e., first name first).
 
 FUNCTION {format.names}
 { 's :=
@@ -448,7 +448,7 @@ FUNCTION {format.names}
  s num.names$ 'numnames :=
  numnames 'namesleft :=
    { namesleft #0 > }
-   { s nameptr "{ff~}{vv~}{ll}{, jj}" format.name$ 't :=
+   { s nameptr "{f.~}{vv~}{ll}{, jj}" format.name$ 't :=
      nameptr #1 >
 	{ namesleft #1 >
 	    { ", " * t * }
@@ -521,11 +521,73 @@ FUNCTION {format.title}
  if$
 }
 
+INTEGERS{ l }
+FUNCTION{ string.length }
+{
+  #1 'l :=
+  {duplicate$ duplicate$ #1 l substring$ = not}
+    { l #1 + 'l :=}
+  while$
+  pop$ l
+}
+
+INTEGERS {find.length search.start search.end done fubar}
+STRINGS {find.string find.pattern x.result}
+FUNCTION {contains}
+{
+  'find.pattern :=
+  'find.string :=
+  find.pattern string.length 'find.length :=
+  #1 'search.start :=
+  find.string string.length find.length - #2 + 'search.end :=
+  #0 'done :=
+  { search.start search.end < }
+  {
+    find.string search.start find.length substring$ find.pattern =
+      { 
+        #1 'done :=
+        search.end 'search.start :=%% stop searching
+      }
+      { #1 search.start + 'search.start := }
+    if$
+  }
+  while$
+  done
+}
+
+FUNCTION {extractthismanylettersafter}
+{
+  'fubar :=
+  'find.pattern :=
+  'find.string :=
+  find.pattern string.length 'find.length :=
+  #1 'search.start :=
+  find.string string.length find.length - #2 + 'search.end :=
+  #0 'done :=
+  { search.start search.end < }
+  {
+    find.string search.start find.length substring$ find.pattern =
+      { 
+        #1 'done :=
+        find.string search.start #1 + fubar substring$ 'x.result :=
+        search.end 'search.start :=%% stop searching
+      }
+      { #1 search.start + 'search.start := }
+    if$
+  }
+  while$
+  x.result
+}
+
 FUNCTION {format.primaryClass}
 {
   primaryClass empty$
       { "" }
-      { " [" primaryClass * "]" *}
+      { eprint primaryClass contains
+            { "" }
+            { " [" primaryClass * "]" *}
+            if$
+      }
   if$            
 }
 
@@ -534,10 +596,10 @@ FUNCTION {format.eprint}
      { ""}
      { archive empty$
           {"\href{http://arxiv.org/abs/" eprint * "}" * 
-             "{{\tt " * format.archive * eprint *
+             "{{\arxivfont " * format.archive * eprint *
               format.primaryClass * "}}" *}
           {"\href{" archive *  "/" * eprint * "}" * 
-             "{{\tt " * format.archive * eprint *
+             "{{\arxivfont " * format.archive * eprint *
               format.primaryClass * "}}" *}
        if$
      }
@@ -556,7 +618,7 @@ FUNCTION {add.doi}
     { skip$ }
     { doi empty$
         {}
-        {"\href{http://dx.doi.org/" doi * "}{" * swap$ * "}" *}
+        {"\doihref{http://dx.doi.org/" doi * "}{" * swap$ * "}" *}
       if$
     }
   if$
@@ -590,7 +652,7 @@ FUNCTION {format.journal.vol.year}
 FUNCTION {format.number}
 { number empty$
    { "" }
-   { "no.~" number * }
+   { "" }
  if$
 }
 
@@ -918,9 +980,9 @@ FUNCTION {article}
  crossref missing$
  { journal missing$ 
      {}
-     { format.journal.vol.year add.doi "journal, volume, and year" output.check
-       format.number output
-       format.pages "pages" output.check
+     { format.journal.vol.year 
+       format.number * " " *
+       format.pages * add.doi output
       }
      if$
     report missing$
@@ -1397,7 +1459,26 @@ FUNCTION {editor.key.organization.label}
 }
 
 FUNCTION {calc.label}
-{ type$ "book" =
+{ 
+eprint empty$
+	{ year 'xyear := year 'xyearmonth :=}
+	{ eprint "/" contains 
+		{ eprint "/" #4 extractthismanylettersafter   }
+		{ eprint #1 #4 substring$ }
+	 if$
+	 duplicate$ #1 #1 substring$ chr.to.int$ #3 < 
+	 	{ "20" }
+		{ "19" }
+	 if$
+	 swap$
+	 *
+	 duplicate$
+	 'xyearmonth :=
+	 #1 #4 substring$
+	 'xyear :=
+	}
+if$
+type$ "book" =
  type$ "inbook" =
  or
    'author.editor.key.label
@@ -1412,10 +1493,10 @@ FUNCTION {calc.label}
    }
  if$
  duplicate$
- year field.or.null purify$ #-1 #2 substring$
+ xyear field.or.null purify$ #-1 #2 substring$
  *
  'label :=
- year field.or.null purify$ #-1 #4 substring$
+ xyearmonth field.or.null purify$ #-1 #10 substring$
  *
  sortify 'sort.label :=
 }
@@ -1571,13 +1652,13 @@ FUNCTION {initialize.longest.label}
 }
 
 FUNCTION {forward.pass}
-{ last.sort.label sort.label =
+{ last.sort.label label =
    { last.extra.num #1 + 'last.extra.num :=
      last.extra.num int.to.chr$ 'extra.label :=
    }
    { "a" chr.to.int$ 'last.extra.num :=
      "" 'extra.label :=
-     sort.label 'last.sort.label :=
+     label 'last.sort.label :=
    }
  if$
  author empty$ { editor empty$ { "" } 'editor if$ } 'author if$
@@ -1637,6 +1718,10 @@ FUNCTION {begin.bib}
  "}"
    write$ newline$
  "\providecommand{\href}[2]{#2}"
+   write$ newline$
+ "\providecommand{\doihref}[2]{\href{#1}{#2}}"
+   write$ newline$
+ "\providecommand{\arxivfont}{\tt}"
    write$ newline$
  "\begin{thebibliography}{"  longest.label  * "}" *
    write$ newline$
