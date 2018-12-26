@@ -1466,7 +1466,7 @@ eprint empty$
 		{ eprint "/" #4 extractthismanylettersafter   }
 		{ eprint #1 #4 substring$ }
 	 if$
-	 duplicate$ #1 #1 substring$ chr.to.int$ #3 < 
+	 duplicate$ #1 #1 substring$ chr.to.int$ #48 - #3 < 
 	 	{ "20" }
 		{ "19" }
 	 if$
