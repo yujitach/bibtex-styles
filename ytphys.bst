@@ -687,7 +687,7 @@ FUNCTION {format.volume}
 FUNCTION {format.number}
 { number empty$
     { "" }
-    { "no.~" number * ", " *}
+    { "" }
   if$
 }
 
@@ -877,7 +877,6 @@ FUNCTION {article}
       format.eprint output
     }
   if$
-  new.sentence
   journal missing$ 
       { format.url output }
       { }
