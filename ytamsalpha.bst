@@ -605,6 +605,16 @@ FUNCTION {format.eprint}
      }
      if$
 }
+FUNCTION {add.url}
+{ duplicate$ empty$
+    { skip$ }
+    { url empty$
+        {}
+        {"\href{" url * "}{" * swap$ * "}" *}
+      if$
+    }
+  if$
+}
 
 FUNCTION {format.url}
 { url empty$
@@ -982,7 +992,12 @@ FUNCTION {article}
      {}
      { format.journal.vol.year 
        format.number * " " *
-       format.pages * add.doi output
+       format.pages * 
+           url missing$
+	          {  add.doi }
+	          {  add.url }
+	  if$
+        output
       }
      if$
     report missing$
@@ -998,7 +1013,10 @@ FUNCTION {article}
  new.sentence
  format.language *
   new.sentence
-  format.url output
+  journal missing$ 
+      { format.url output }
+      { }
+  if$
   new.sentence
   note output
   new.sentence
