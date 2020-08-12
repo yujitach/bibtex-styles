@@ -1640,6 +1640,8 @@ FUNCTION {presort}
  *
  year field.or.null sortify
  *
+ pages field.or.null sortify
+ *
  "    "
  *
  title field.or.null
