@@ -1638,6 +1638,8 @@ FUNCTION {presort}
  *
  "    "
  *
+ eprint field.or.null sortify
+ *
  year field.or.null sortify
  *
  pages field.or.null sortify
