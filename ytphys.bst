@@ -371,7 +371,7 @@ FUNCTION {format.names}
 		'skip$
 	      if$
 	      t "others" =
-		{ " {\em et al.}" * }
+		{ " {\em et~al.}" * }
 		{ string.and * t * }
 	      if$
 	    }
@@ -776,11 +776,11 @@ FUNCTION {format.crossref.editor}
 { editor #1 "{vv~}{ll}" format.name$
   editor num.names$ duplicate$
   #2 >
-    { pop$ " {\em et.~al.}" * }
+    { pop$ " {\em et~al.}" * }
     { #2 <
 	'skip$
 	{ editor #2 "{ff }{vv }{ll}{ jj}" format.name$ "others" =
-	    { " {\em et.~al.}" * }
+	    { " {\em et~al.}" * }
 	    { string.and * editor #2 "{vv~}{ll}" format.name$ * }
 	  if$
 	}
