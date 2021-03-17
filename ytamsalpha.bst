@@ -1118,7 +1118,12 @@ FUNCTION {incollection}
 { output.bibitem
   format.collaboration output
  format.authors "author" output.check
- format.title add.doi "title" output.check
+ format.title 
+           url missing$
+	          {  add.doi }
+	          {  add.url }
+	  if$
+ "title" output.check
  crossref missing$
    { format.incoll.title.editors "booktitle" output.check
      format.bookvolume.series.number output
@@ -1135,9 +1140,7 @@ FUNCTION {incollection}
   new.block
  format.eprint output
  new.block
-  format.url output
-  new.block
- note output
+  note output
  new.sentence
  format.SLACcitation output
  fin.entry
@@ -1147,7 +1150,12 @@ FUNCTION {inproceedings}
 { output.bibitem
   format.collaboration output
  format.authors "author" output.check
- format.title add.doi "title" output.check
+ format.title
+ url missing$
+         {  add.doi }
+         {  add.url }
+ if$ 
+ "title" output.check
  crossref missing$
    { format.inproc.title.address.editors "booktitle" output.check
      format.bookvolume.series.number output
@@ -1161,8 +1169,6 @@ FUNCTION {inproceedings}
  format.book.pages output
   new.block
  format.eprint output
-  new.block
- format.url output
   new.block
  format.language *
   note output
