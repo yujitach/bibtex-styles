@@ -175,6 +175,7 @@ ENTRY
     report
     SLACcitation
     url
+	sortOrder
  }
  {}
  { label extra.label sort.label bysame xyear xyearmonth}
@@ -1647,6 +1648,8 @@ FUNCTION {presort}
  eprint field.or.null sortify
  *
  year field.or.null sortify
+ *
+ sortOrder field.or.null sortify
  *
  pages field.or.null sortify
  *
