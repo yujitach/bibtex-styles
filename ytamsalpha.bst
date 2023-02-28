@@ -1483,6 +1483,79 @@ FUNCTION {editor.key.organization.label}
  if$
 }
 
+
+%% from http://tug.ctan.org/info/bibtex/tamethebeast/
+INTEGERS { a b }
+
+FUNCTION {mult}
+{
+ 'a := 			    %% we store the first value
+ 'b :=			    %% we store the second value
+
+ b #0 <			    %% We remember the sign of b, and
+    {#-1 #0 b - 'b :=}	    %% then consider its absolute value. 
+    {#1}		    %% 
+ if$			    %%
+
+ #0			    %% Put 0 on the stack.
+ {b #0 >}		    %% While b is strictly positive, 
+ {			    %% we add a to the value on the stack 
+   a +			    %% and decrement b. 
+   b #1 - 'b :=		    %% 
+ }			    %% 
+ while$			    %%
+
+ swap$ 	  		    %% Last, we take the opposite
+   'skip$  		    %% if b was negative.
+   {#0 swap$ -}		    %% 
+ if$			    %% 
+}
+
+FUNCTION {chr.to.value}	      %% The ASCII code of a character
+{
+  chr.to.int$ #48 -	      %% ASCII value of "0" -> 48
+  duplicate$ duplicate$	      %%	        "1" -> 49
+  #0 < swap$ #9 > or	      %%		   ...
+  {			      %%                "9" -> 57
+      #48 + int.to.chr$ 
+      " is not a number..." * 
+      warning$		      %% Return 0 if it is not a number
+      pop$ #0		      %% 
+    }
+  {}
+  if$
+}
+
+FUNCTION {str.to.int.aux}     %% The auxiliary function
+{
+  {duplicate$ empty$ not}     %% While the string is not empty
+    {			      %% consider its first char
+      swap$ #10 mult 'a :=    %% and ``add'' it at the end of
+      duplicate$ #1 #1 substring$   %% the result.
+      chr.to.value a +
+      swap$
+      #2 global.max$ substring$
+    }
+  while$
+  pop$
+}
+
+FUNCTION {str.to.int}
+{			      %% Handling negative values
+  duplicate$ #1 #1 substring$ "-" = 
+    {#1 swap$ #2 global.max$ substring$}
+    {#0 swap$}
+  if$
+			      %% Initialization, and then 
+  #0 swap$ str.to.int.aux     %% call to the aux. funtion
+  swap$ 
+    {#0 swap$ -}	      %% And handle the sign.
+    {}
+  if$
+}
+
+%% end http://tug.ctan.org/info/bibtex/tamethebeast/
+
 FUNCTION {calc.label}
 { 
 eprint empty$
@@ -1517,6 +1590,7 @@ type$ "book" =
      if$
    }
  if$
+ year str.to.int xyear str.to.int < { year 'xyear := } { } if$
  duplicate$
  xyear field.or.null purify$ #-1 #2 substring$
  *
